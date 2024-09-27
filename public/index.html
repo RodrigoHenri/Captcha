@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de Captcha</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Verificação de Captcha</h1>
+
+   
+    <form id="captchaForm">
+        <div>
+            <label for="captcha">Digite o captcha:</label><br>
+            <img src="/captcha" alt="Captcha Image"><br>
+            <input type="text" id="captcha" name="captcha" required>
+        </div>
+        <button type="submit">Verificar</button>
+    </form>
+
+    
+    <p id="message" style="color: red; display: none;"></p>
+
+    <script>
+        document.getElementById('captchaForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const captchaValue = document.getElementById('captcha').value;
+
+            
+            fetch('/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `captcha=${encodeURIComponent(captchaValue)}`
+            })
+            .then(response => response.text()) 
+            .then(data => {
+                const messageElement = document.getElementById('message');
+                
+                if (data.includes('Captcha correto')) {
+                    messageElement.style.color = 'yellow';
+                    messageElement.textContent = 'Captcha correto!';
+                } else {
+                    messageElement.style.color = 'red';
+                    messageElement.textContent = 'Captcha incorreto, tente novamente.';
+                }
+
+                messageElement.style.display = 'block'; 
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+            });
+        });
+    </script>
+</body>
+</html>
